@@ -1,6 +1,6 @@
-const express = require("express");
-const mysql = require("mysql2");
-const inputCheck = require("./utils/inputCheck");
+const express = require('express');
+const mysql = require('mysql2');
+const inputCheck = require('./utils/inputCheck');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -12,18 +12,18 @@ app.use(express.json());
 // Connect to database
 const db = mysql.createConnection(
   {
-    host: "localhost",
+    host: 'localhost',
     // Your MySQL username,
-    user: "root",
+    user: 'root',
     // Your MySQL password
-    password: "Bootcamp25!",
-    database: "election",
+    password: '',
+    database: 'election'
   },
-  console.log("Connected to the election database.")
+  console.log('Connected to the election database.')
 );
 
 // Get all candidates
-app.get("/api/candidates", (req, res) => {
+app.get('/api/candidates', (req, res) => {
   const sql = `SELECT * FROM candidates`;
 
   db.query(sql, (err, rows) => {
@@ -32,31 +32,31 @@ app.get("/api/candidates", (req, res) => {
       return;
     }
     res.json({
-      message: "success",
-      data: rows,
+      message: 'success',
+      data: rows
     });
   });
 });
 
-// GET a single candidate
-app.get("/api/candidate/:id", (req, res) => {
+// Get a single candidate
+app.get('/api/candidate/:id', (req, res) => {
   const sql = `SELECT * FROM candidates WHERE id = ?`;
   const params = [req.params.id];
 
-  db.query(sql, params, (err, rows) => {
+  db.query(sql, params, (err, row) => {
     if (err) {
       res.status(400).json({ error: err.message });
       return;
     }
     res.json({
-      message: "success",
-      data: rows,
+      message: 'success',
+      data: row
     });
   });
 });
 
 // Delete a candidate
-app.delete("/api/candidate/:id", (req, res) => {
+app.delete('/api/candidate/:id', (req, res) => {
   const sql = `DELETE FROM candidates WHERE id = ?`;
   const params = [req.params.id];
 
@@ -65,32 +65,33 @@ app.delete("/api/candidate/:id", (req, res) => {
       res.statusMessage(400).json({ error: res.message });
     } else if (!result.affectedRows) {
       res.json({
-        message: "Candidate not found",
+        message: 'Candidate not found'
       });
     } else {
       res.json({
-        message: "deleted",
+        message: 'deleted',
         changes: result.affectedRows,
-        id: req.params.id,
+        id: req.params.id
       });
     }
   });
 });
 
 // Create a candidate
-app.post("/api/candidate", ({ body }, res) => {
+app.post('/api/candidate', ({ body }, res) => {
   const errors = inputCheck(
     body,
-    "first_name",
-    "last_name",
-    "industry_connected"
+    'first_name',
+    'last_name',
+    'industry_connected'
   );
   if (errors) {
     res.status(400).json({ error: errors });
     return;
   }
+
   const sql = `INSERT INTO candidates (first_name, last_name, industry_connected)
-  VALUES (?,?,?)`;
+    VALUES (?,?,?)`;
   const params = [body.first_name, body.last_name, body.industry_connected];
 
   db.query(sql, params, (err, result) => {
@@ -99,8 +100,8 @@ app.post("/api/candidate", ({ body }, res) => {
       return;
     }
     res.json({
-      message: "success",
-      data: body,
+      message: 'success',
+      data: body
     });
   });
 });
